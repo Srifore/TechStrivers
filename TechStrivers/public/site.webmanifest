@@ -1,0 +1,26 @@
+{
+  "name": "TechStrivers Innovation & Learning Platform",
+  "short_name": "TechStrivers",
+  "description": "Hands-on engineering projects, IoT training, robotics, AI, PCB design, and internships in Bengaluru.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071A2D",
+  "theme_color": "#071A2D",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

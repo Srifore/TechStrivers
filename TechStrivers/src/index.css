@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --navy: #071A2D;
+    --navy-light: #0E2A47;
+    --orange: #FF6B16;
+    --orange-hover: #E55B05;
+    --blue: #1769C2;
+    --teal: #35A99A;
+    --white: #FFFFFF;
+    --light-blue: #EAF3FA;
+    --light-grey: #F5F7FA;
+    --dark-text: #102A43;
+    --gold: #F5A623;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--light-grey);
+    color: var(--dark-text);
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Technical Blueprint Grid Pattern */
+.bg-tech-grid {
+  background-color: #071A2D;
+  background-image: 
+    linear-gradient(rgba(23, 105, 194, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 105, 194, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-tech-grid-light {
+  background-color: #F5F7FA;
+  background-image: 
+    linear-gradient(rgba(16, 42, 67, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 42, 67, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #071A2D;
+}
+::-webkit-scrollbar-thumb {
+  background: #1769C2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF6B16;
+}
+
+/* Hexagon Brand Emblem */
+.hex-container {
+  width: 44px;
+  height: 50px;
+  background: linear-gradient(135deg, #FF6B16 0%, #F5A623 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.hex-container:hover {
+  transform: rotate(12deg) scale(1.05);
+}
+
+.hex-inner {
+  width: 38px;
+  height: 44px;
+  background: #071A2D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  color: #FF6B16;
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+/* Buttons matching Section 16 Guidelines */
+.btn-tech-orange,
+.btn-primary {
+  background-color: #FF6B16;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(255, 107, 22, 0.3);
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.btn-tech-orange:hover,
+.btn-primary:hover {
+  background-color: #E55B05;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 22, 0.45);
+}
+
+.btn-tech-outline {
+  background: transparent;
+  color: #102A43;
+  font-weight: 700;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid #1769C2;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.btn-tech-outline:hover {
+  background: #EAF3FA;
+  border-color: #1769C2;
+  color: #1769C2;
+  transform: translateY(-2px);
+}
+
+.btn-tech-dark {
+  background: transparent;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.btn-tech-dark:hover {
+  border-color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Engineering Cards matching Section 13 Guidelines */
+.card-engineering {
+  background-color: #FFFFFF;
+  border: 1px solid #EAF3FA;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(7, 26, 45, 0.05);
+  transition: all 0.25s ease;
+}
+
+.card-engineering:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(7, 26, 45, 0.1);
+  border-color: rgba(23, 105, 194, 0.35);
+}
+
+.card-engineering-dark {
+  background-color: #0E2A47;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: all 0.25s ease;
+}
+
+.card-engineering-dark:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 107, 22, 0.5);
+}
+
+.hero-photo-wrapper {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(7, 26, 45, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 26, 45, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+/* Base Modal Content */
+.modal-content,
+.modal-content-erp {
+  background-color: #0E2A47;
+  border-radius: 0.85rem;
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  position: relative;
+  border: 1px solid rgba(23, 105, 194, 0.4);
+  color: #FFFFFF;
+}
+
+.modal-content-light {
+  background-color: #FFFFFF;
+  border-radius: 0.85rem;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  border: 1px solid #EAF3FA;
+}
+
+/* Universal Base Form Input */
+.form-input,
+.form-input-erp {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid rgba(23, 105, 194, 0.5) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.9rem !important;
+  outline: none !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  font-family: inherit !important;
+  color: #FFFFFF !important;
+  background-color: #071A2D !important;
+}
+
+.form-input.pl-9,
+.form-input.pl-10,
+.form-input.has-icon-left,
+.form-input-erp.pl-9,
+.form-input-erp.pl-10,
+.form-input-erp.has-icon-left {
+  padding-left: 2.75rem !important;
+}
+
+.form-input.pr-10,
+.form-input.has-icon-right,
+.form-input-erp.pr-10,
+.form-input-erp.has-icon-right {
+  padding-right: 2.75rem !important;
+}
+
+.form-input::placeholder,
+.form-input-erp::placeholder {
+  color: #94A3B8 !important;
+}
+
+.form-input:focus,
+.form-input-erp:focus {
+  border-color: #FF6B16 !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 22, 0.25) !important;
+}
+
+/* Custom ERP Select Control with Dropdown Chevron */
+select,
+.form-select,
+.form-select-erp,
+select.form-input-erp,
+select.form-input {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  padding: 0.75rem 2.5rem 0.75rem 1rem !important;
+  border: 1px solid rgba(23, 105, 194, 0.5) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.9rem !important;
+  outline: none !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  font-family: inherit !important;
+  color: #FFFFFF !important;
+  background-color: #071A2D !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2335A99A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.85rem center !important;
+  background-size: 1.1rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  cursor: pointer !important;
+}
+
+select:focus,
+.form-select:focus,
+.form-select-erp:focus,
+select.form-input-erp:focus,
+select.form-input:focus {
+  border-color: #FF6B16 !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 22, 0.25) !important;
+}
+
+option,
+select option,
+.form-select option,
+.form-select-erp option,
+select.form-input-erp option,
+select.form-input option {
+  background-color: #071A2D !important;
+  color: #FFFFFF !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem !important;
+}
+
+/* ERP Textarea Control */
+.form-textarea-erp,
+textarea.form-input-erp,
+textarea.form-input {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid rgba(23, 105, 194, 0.5) !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.9rem !important;
+  outline: none !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  font-family: inherit !important;
+  color: #FFFFFF !important;
+  background-color: #071A2D !important;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.form-textarea-erp:focus,
+textarea.form-input-erp:focus,
+textarea.form-input:focus {
+  border-color: #FF6B16 !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 22, 0.25) !important;
+}
+
+/* Public Light Form Controls */
+.form-input-light {
+  width: 100% !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  padding: 0.75rem 1rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  color: #102A43;
+  background-color: #F5F7FA;
+}
+
+.form-input-light.pl-9,
+.form-input-light.pl-10,
+.form-input-light.has-icon-left {
+  padding-left: 2.75rem !important;
+}
+
+.form-input-light.pr-10,
+.form-input-light.has-icon-right {
+  padding-right: 2.75rem !important;
+}
+
+.form-input-light:focus {
+  border-color: #FF6B16;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(255, 107, 22, 0.15);
+}
+
+/* Infinite Marquee Ticker */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover,
+.marquee-container:hover .animate-marquee {
+  animation-play-state: paused !important;
+}
+
+/* Fade-in transition used by modals and grids */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+

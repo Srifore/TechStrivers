@@ -1,0 +1,9 @@
+# TechStrivers Search Engine Crawler Directives
+# The ERP Admin Portal runs on a separate app/origin (see admin.html) and
+# excludes itself from indexing via its own noindex meta tag - no rule
+# needed here.
+User-agent: *
+Allow: /
+
+# XML Sitemap Location
+Sitemap: https://techstrivers.com/sitemap.xml
