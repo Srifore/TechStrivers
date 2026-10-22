@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+# Never allow directory listing of the API folder
+Options -Indexes

@@ -19,11 +19,13 @@ export default function ContactPage() {
     "name": "TechStrivers Innovation & Learning Center",
     "image": "https://techstrivers.com/images/hero_lab.jpg",
     "telephone": "+91-8549990019",
-    "email": "info@techstrivers.in",
+    "email": "info@techstrivers.com",
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "No. 85 & 86, Ground Floor, BSF STS Road, Yelahanka, near Reva Circle, Sirinagar Layout, Kattigenahalli",
       "addressLocality": "Bengaluru",
       "addressRegion": "Karnataka",
+      "postalCode": "560064",
       "addressCountry": "IN"
     },
     "sameAs": [
@@ -77,7 +79,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm">Main Campus & Lab</h3>
-                    <p className="text-slate-600 text-sm mt-0.5">Srinagar, Bengaluru, Karnataka - 560050</p>
+                    <p className="text-slate-600 text-sm mt-0.5">No. 85 & 86, Ground Floor, BSF STS Road, Yelahanka, near Reva Circle, Sirinagar Layout, Kattigenahalli, Bengaluru, Karnataka 560064</p>
                   </div>
                 </div>
 
@@ -98,7 +100,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm">Email Address</h3>
-                    <p className="text-slate-600 text-sm mt-0.5">info@techstrivers.in</p>
+                    <p className="text-slate-600 text-sm mt-0.5">info@techstrivers.com</p>
                   </div>
                 </div>
 

@@ -38,8 +38,10 @@ export default function HomePage({ setActivePage, openEnquireModal }) {
         "description": "Hands-on engineering projects, technology training, and innovation programs in IoT, Embedded Systems, Robotics, AI, Electronics, and Automation.",
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": "No. 85 & 86, Ground Floor, BSF STS Road, Yelahanka, near Reva Circle, Sirinagar Layout, Kattigenahalli",
           "addressLocality": "Bengaluru",
           "addressRegion": "Karnataka",
+          "postalCode": "560064",
           "addressCountry": "IN"
         },
         "sameAs": [
@@ -54,8 +56,10 @@ export default function HomePage({ setActivePage, openEnquireModal }) {
         "image": "https://techstrivers.com/images/hero_lab.jpg",
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": "No. 85 & 86, Ground Floor, BSF STS Road, Yelahanka, near Reva Circle, Sirinagar Layout, Kattigenahalli",
           "addressLocality": "Bengaluru",
           "addressRegion": "Karnataka",
+          "postalCode": "560064",
           "addressCountry": "IN"
         }
       }

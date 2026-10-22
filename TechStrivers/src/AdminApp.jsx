@@ -1,29 +1,41 @@
 import React, { useState } from 'react';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
-import { DataProvider } from './context/DataContext';
+import { DataProvider, useData } from './context/DataContext';
 import { PUBLIC_SITE_URL } from './config';
 
 function AdminRoot() {
+  const { logout, loading, adminProfile } = useData();
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('ts_admin_auth') === 'true';
   });
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('ts_admin_auth', 'true');
   };
 
   const handleLogout = () => {
+    logout();
     setIsAuthenticated(false);
-    localStorage.removeItem('ts_admin_auth');
   };
 
   const goToPublicSite = () => {
     window.location.href = PUBLIC_SITE_URL;
   };
 
-  if (!isAuthenticated) {
+  // While a remembered session's profile/leads are still being fetched,
+  // hold off rendering AdminLayout - its children assume adminProfile is set.
+  if (isAuthenticated && loading) {
+    return (
+      <div className="min-h-screen bg-[#071A2D] flex items-center justify-center text-slate-300 text-sm">
+        Loading ERP Portal...
+      </div>
+    );
+  }
+
+  // A stale "remember session" flag with no matching profile means the
+  // token was invalid/expired server-side - fall back to the login screen.
+  if (!isAuthenticated || !adminProfile) {
     return (
       <AdminLogin
         onLoginSuccess={handleLoginSuccess}

@@ -4,42 +4,50 @@ import TechStriversLogo from '../../components/TechStriversLogo';
 import { useData } from '../../context/DataContext';
 
 export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
-  const { adminProfile } = useData();
+  const { login } = useData();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   // 2FA state step
   const [step, setStep] = useState('credentials'); // 'credentials' | '2fa'
   const [otp, setOtp] = useState('');
+  const [twoFactorMethod, setTwoFactorMethod] = useState('authenticator');
 
-  const handleCredentialsSubmit = (e) => {
+  const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
-    const targetEmail = (adminProfile?.email || 'admin@techstrivers.in').trim().toLowerCase();
-    const targetPass = adminProfile?.password || 'admin123';
-
-    if (email.trim().toLowerCase() === targetEmail && password === targetPass) {
-      setErrorMsg('');
-      if (adminProfile?.twoFactorEnabled) {
+    setSubmitting(true);
+    try {
+      const res = await login(email, password);
+      if (res.requiresOtp) {
+        setErrorMsg('');
+        setTwoFactorMethod(res.twoFactorMethod || 'authenticator');
         setStep('2fa');
       } else {
         onLoginSuccess();
       }
-    } else {
-      setErrorMsg('Invalid administrator credentials. Please try again.');
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid administrator credentials. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handle2FASubmit = (e) => {
+  const handle2FASubmit = async (e) => {
     e.preventDefault();
-    if (otp.trim() === '123456') {
+    setSubmitting(true);
+    try {
+      await login(email, password, otp);
       setErrorMsg('');
       onLoginSuccess();
-    } else {
-      setErrorMsg('Invalid 2FA Verification Code. Enter 6-digit authenticator code (e.g. 123456).');
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid 2FA Verification Code. Enter 6-digit authenticator code (e.g. 123456).');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -74,7 +82,7 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
             </h2>
             <p className="text-xs text-slate-300">
               {step === '2fa'
-                ? `Enter 6-digit OTP code from your ${adminProfile?.twoFactorMethod === 'sms' ? 'SMS' : 'Authenticator App'} to verify login.`
+                ? `Enter 6-digit OTP code from your ${twoFactorMethod === 'sms' ? 'SMS' : 'Authenticator App'} to verify login.`
                 : 'Sign in to access the TechStrivers ERP Admin Management Portal.'}
             </p>
           </div>
@@ -147,9 +155,10 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full btn-tech-orange justify-center py-3 text-sm font-extrabold uppercase tracking-wider"
+                  disabled={submitting}
+                  className="w-full btn-tech-orange justify-center py-3 text-sm font-extrabold uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Sign In to ERP Panel <ArrowRight className="w-4 h-4 ml-1" />
+                  {submitting ? 'Signing In...' : <>Sign In to ERP Panel <ArrowRight className="w-4 h-4 ml-1" /></>}
                 </button>
               </div>
 
@@ -195,9 +204,10 @@ export default function AdminLogin({ onLoginSuccess, onBackToSite }) {
                 </button>
                 <button
                   type="submit"
-                  className="btn-tech-orange py-2.5 text-xs flex-2 justify-center font-bold uppercase tracking-wider"
+                  disabled={submitting}
+                  className="btn-tech-orange py-2.5 text-xs flex-2 justify-center font-bold uppercase tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Verify & Enter ERP <ShieldCheck className="w-4 h-4 ml-1" />
+                  {submitting ? 'Verifying...' : <>Verify & Enter ERP <ShieldCheck className="w-4 h-4 ml-1" /></>}
                 </button>
               </div>
             </form>

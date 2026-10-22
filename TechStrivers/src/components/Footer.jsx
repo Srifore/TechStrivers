@@ -75,7 +75,7 @@ export default function Footer({ openEnquireModal }) {
             <div className="space-y-3 text-xs text-slate-300">
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#FF6B16] shrink-0 mt-0.5" />
-                <span>Srinagar, Bengaluru, Karnataka - 560050</span>
+                <span>No. 85 & 86, Ground Floor, BSF STS Road, Yelahanka, near Reva Circle, Sirinagar Layout, Kattigenahalli, Bengaluru, Karnataka 560064</span>
               </div>
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 text-[#1769C2] shrink-0 mt-0.5" />
@@ -90,8 +90,8 @@ export default function Footer({ openEnquireModal }) {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-[#35A99A] shrink-0" />
-                <a href="mailto:info@techstrivers.in" className="hover:text-[#FF6B16] transition-colors text-slate-300 decoration-none">
-                  info@techstrivers.in
+                <a href="mailto:info@techstrivers.com" className="hover:text-[#FF6B16] transition-colors text-slate-300 decoration-none">
+                  info@techstrivers.com
                 </a>
               </div>
             </div>

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import {
-  User, Mail, Phone, Lock, ShieldCheck, Key, QrCode, Smartphone,
+  User, Mail, Phone, Lock, ShieldCheck, Key, QrCode,
   CheckCircle2, AlertCircle, Save, ToggleLeft, ToggleRight
 } from 'lucide-react';
+import QRCode from 'qrcode';
 import { useData } from '../../context/DataContext';
 
 export default function AdminProfile() {
-  const { adminProfile, updateAdminProfile, updateAdminPassword, toggle2FA } = useData();
+  const {
+    adminProfile, updateAdminProfile, updateAdminPassword,
+    start2FASetup, confirm2FA, disable2FA,
+  } = useData();
 
   // Profile info state
   const [name, setName] = useState(adminProfile.name);
@@ -20,25 +24,32 @@ export default function AdminProfile() {
   const [confirmPass, setConfirmPass] = useState('');
   const [passMsg, setPassMsg] = useState({ type: '', text: '' });
 
-  // 2FA state
-  const [is2FA, setIs2FA] = useState(adminProfile.twoFactorEnabled);
-  const [twoFaMethod, setTwoFaMethod] = useState(adminProfile.twoFactorMethod || 'authenticator');
-  const [otpSuccessMsg, setOtpSuccessMsg] = useState('');
+  // 2FA state - setupData holds { secret, otpauthUrl } while enrolment is pending
+  const is2FA = adminProfile.twoFactorEnabled;
+  const [setupData, setSetupData] = useState(null);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const [setupCode, setSetupCode] = useState('');
+  const [twoFaBusy, setTwoFaBusy] = useState(false);
+  const [twoFaMsg, setTwoFaMsg] = useState({ type: '', text: '' });
 
-  const handleProfileSave = (e) => {
+  const handleProfileSave = async (e) => {
     e.preventDefault();
-    updateAdminProfile({ name, email, phone });
-    setProfileMsg('Admin profile information updated successfully!');
+    try {
+      await updateAdminProfile({ name, email, phone });
+      setProfileMsg('Admin profile information updated successfully!');
+    } catch (err) {
+      setProfileMsg(`Failed to update profile: ${err.message}`);
+    }
     setTimeout(() => setProfileMsg(''), 3500);
   };
 
-  const handlePasswordSave = (e) => {
+  const handlePasswordSave = async (e) => {
     e.preventDefault();
     if (newPass !== confirmPass) {
       setPassMsg({ type: 'error', text: 'New passwords do not match.' });
       return;
     }
-    const res = updateAdminPassword(currentPass, newPass);
+    const res = await updateAdminPassword(currentPass, newPass);
     if (res.success) {
       setPassMsg({ type: 'success', text: res.message });
       setCurrentPass('');
@@ -50,12 +61,53 @@ export default function AdminProfile() {
     setTimeout(() => setPassMsg({ type: '', text: '' }), 4000);
   };
 
-  const handle2FAToggle = () => {
-    const nextState = !is2FA;
-    setIs2FA(nextState);
-    toggle2FA(nextState, twoFaMethod);
-    setOtpSuccessMsg(nextState ? '2FA Enabled! Authenticator code will be required during sign-in.' : '2FA Security Disabled.');
-    setTimeout(() => setOtpSuccessMsg(''), 4000);
+  const flash2FAMsg = (type, text) => {
+    setTwoFaMsg({ type, text });
+    setTimeout(() => setTwoFaMsg({ type: '', text: '' }), 4000);
+  };
+
+  const handle2FAToggle = async () => {
+    if (twoFaBusy) return;
+    setTwoFaBusy(true);
+    try {
+      if (is2FA) {
+        await disable2FA();
+        flash2FAMsg('success', '2FA Security Disabled.');
+      } else if (setupData) {
+        // Toggling off mid-setup just abandons it; 2FA was never switched on.
+        setSetupData(null);
+        setQrDataUrl('');
+        setSetupCode('');
+      } else {
+        const res = await start2FASetup('authenticator');
+        setSetupData(res);
+        setQrDataUrl(await QRCode.toDataURL(res.otpauthUrl, { width: 200, margin: 1 }));
+      }
+    } catch (err) {
+      flash2FAMsg('error', `Failed to update 2FA: ${err.message}`);
+    } finally {
+      setTwoFaBusy(false);
+    }
+  };
+
+  const handle2FAConfirm = async (e) => {
+    e.preventDefault();
+    setTwoFaBusy(true);
+    try {
+      const res = await confirm2FA(setupCode);
+      if (res.success) {
+        setSetupData(null);
+        setQrDataUrl('');
+        setSetupCode('');
+        flash2FAMsg('success', '2FA Enabled! Authenticator code will be required during sign-in.');
+      } else {
+        flash2FAMsg('error', res.message);
+      }
+    } catch (err) {
+      flash2FAMsg('error', `Failed to verify code: ${err.message}`);
+    } finally {
+      setTwoFaBusy(false);
+    }
   };
 
   return (
@@ -233,10 +285,11 @@ export default function AdminProfile() {
               <button
                 type="button"
                 onClick={handle2FAToggle}
-                className="bg-transparent border-none cursor-pointer focus:outline-none"
-                title={is2FA ? "Disable 2FA" : "Enable 2FA"}
+                disabled={twoFaBusy}
+                className="bg-transparent border-none cursor-pointer focus:outline-none disabled:opacity-50 disabled:cursor-wait"
+                title={is2FA ? "Disable 2FA" : setupData ? "Cancel 2FA setup" : "Enable 2FA"}
               >
-                {is2FA ? (
+                {is2FA || setupData ? (
                   <ToggleRight className="w-10 h-10 text-[#FF6B16] transition-transform scale-110" />
                 ) : (
                   <ToggleLeft className="w-10 h-10 text-slate-600 hover:text-slate-400" />
@@ -248,75 +301,59 @@ export default function AdminProfile() {
               Two-Factor Authentication adds an extra layer of security to your ERP Administrator account by requiring a 6-digit verification code from your authenticator app during sign-in.
             </p>
 
-            {otpSuccessMsg && (
-              <div className="p-3 bg-[#071A2D] border border-[#35A99A] text-[#35A99A] text-xs rounded font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" /> {otpSuccessMsg}
+            {twoFaMsg.text && (
+              <div className={`p-3 bg-[#071A2D] border text-xs rounded font-bold flex items-center gap-2 ${
+                twoFaMsg.type === 'error' ? 'border-red-800 text-red-300' : 'border-[#35A99A] text-[#35A99A]'
+              }`}>
+                {twoFaMsg.type === 'error' ? <AlertCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />} {twoFaMsg.text}
               </div>
             )}
 
             {is2FA ? (
-              <div className="space-y-6 pt-2">
-                
-                {/* 2FA Method Selector */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-bold text-white uppercase tracking-wider">Select 2FA Method</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setTwoFaMethod('authenticator')}
-                      className={`p-3 rounded-md text-xs font-bold border cursor-pointer flex flex-col items-center gap-1.5 ${
-                        twoFaMethod === 'authenticator'
-                          ? 'bg-[#071A2D] border-[#FF6B16] text-[#FF6B16]'
-                          : 'bg-[#071A2D]/50 border-slate-700 text-slate-400'
-                      }`}
-                    >
-                      <QrCode className="w-5 h-5" /> Authenticator App
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTwoFaMethod('sms')}
-                      className={`p-3 rounded-md text-xs font-bold border cursor-pointer flex flex-col items-center gap-1.5 ${
-                        twoFaMethod === 'sms'
-                          ? 'bg-[#071A2D] border-[#FF6B16] text-[#FF6B16]'
-                          : 'bg-[#071A2D]/50 border-slate-700 text-slate-400'
-                      }`}
-                    >
-                      <Smartphone className="w-5 h-5" /> SMS OTP
-                    </button>
-                  </div>
-                </div>
-
-                {/* Authenticator QR Code & Key Box */}
-                {twoFaMethod === 'authenticator' && (
-                  <div className="bg-[#071A2D] p-5 rounded-md border border-slate-700 space-y-4 text-center">
-                    <div className="font-bold text-xs text-white uppercase">Scan with Google Authenticator / Authy</div>
-                    
-                    {/* Visual QR Code Generator Graphic */}
-                    <div className="w-36 h-36 mx-auto bg-white p-2 rounded-md shadow-lg flex items-center justify-center border-2 border-[#1769C2]">
-                      <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
-                        <path d="M0 0h35v35H0zM65 0h35v35H65zM0 65h35v35H0z" fill="#071A2D" />
-                        <path d="M5 5h25v25H5zM70 5h25v25H70zM5 70h25v25H5z" fill="#FFF" />
-                        <path d="M10 10h15v15H10zM75 10h15v15H75zM10 75h15v15H10z" fill="#FF6B16" />
-                        <path d="M40 0h15v15H40zM40 25h20v20H40zM25 40h15v15H25zM65 45h35v15H65zM45 65h15v35H45zM70 70h25v10H70zM80 85h15v15H80z" fill="#1769C2" />
-                      </svg>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="text-[10px] text-slate-400 uppercase tracking-widest">Secret Key (Manual Entry)</div>
-                      <div className="font-mono text-xs font-extrabold text-[#35A99A] bg-[#0E2A47] p-2 rounded border border-slate-700">
-                        {adminProfile.secretKey}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Status Indicator */}
-                <div className="p-3 bg-emerald-950/60 border border-emerald-800 rounded text-emerald-300 text-xs font-bold flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>2FA Security Guard Active</span>
-                </div>
-
+              <div className="p-3 bg-emerald-950/60 border border-emerald-800 rounded text-emerald-300 text-xs font-bold flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>2FA Security Guard Active (Authenticator App)</span>
               </div>
+            ) : setupData ? (
+              <form onSubmit={handle2FAConfirm} className="bg-[#071A2D] p-5 rounded-md border border-slate-700 space-y-4 text-center">
+                <div className="font-bold text-xs text-white uppercase flex items-center justify-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-[#FF6B16]" /> Scan with Google Authenticator / Authy
+                </div>
+
+                <div className="w-44 h-44 mx-auto bg-white p-2 rounded-md shadow-lg flex items-center justify-center border-2 border-[#1769C2]">
+                  {qrDataUrl && <img src={qrDataUrl} alt="2FA QR code" className="w-full h-full" />}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="text-[10px] text-slate-400 uppercase tracking-widest">Secret Key (Manual Entry)</div>
+                  <div className="font-mono text-xs font-extrabold text-[#35A99A] bg-[#0E2A47] p-2 rounded border border-slate-700 break-all">
+                    {setupData.secret}
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-left">
+                  <label className="block text-xs font-bold text-white uppercase tracking-wider">Enter the 6-digit code from the app</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    required
+                    placeholder="123456"
+                    value={setupCode}
+                    onChange={(e) => setSetupCode(e.target.value.replace(/\D/g, ''))}
+                    className="form-input-erp text-center font-mono tracking-[0.4em]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={twoFaBusy || setupCode.length !== 6}
+                  className="w-full btn-tech-orange justify-center text-xs py-2 gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <ShieldCheck className="w-4 h-4" /> {twoFaBusy ? 'Verifying...' : 'Verify & Enable 2FA'}
+                </button>
+              </form>
             ) : (
               <div className="p-4 bg-[#071A2D] border border-amber-800/40 rounded text-amber-300 text-xs space-y-1">
                 <div className="font-bold uppercase tracking-wider flex items-center gap-1.5">
